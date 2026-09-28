@@ -1,0 +1,277 @@
+:root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --text: #1d2330;
+    --muted: #667085;
+    --border: #e1e4ea;
+    --primary: #3b5bdb;
+    --primary-text: #ffffff;
+    --danger: #c92a2a;
+    --agent-bubble: #eef2ff;
+    --participant-bubble: #f1f3f5;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin: 0 0 1rem;
+}
+
+h1:focus {
+    outline: none;
+}
+
+h2 {
+    font-size: 1.05rem;
+    margin: 1.5rem 0 0.5rem;
+}
+
+.app-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+}
+
+.brand {
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.app-main {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding-inline: 1rem;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.card.center {
+    text-align: center;
+}
+
+.card.error {
+    border-color: var(--danger);
+}
+
+.card.error pre {
+    white-space: pre-wrap;
+    background: #fff5f5;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.hint {
+    color: var(--muted);
+    margin: 0.25rem 0 0;
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    margin: 1rem 0 0.35rem;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    background: var(--surface);
+    color: var(--text);
+}
+
+button,
+.button {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.6rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+button.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--primary-text);
+}
+
+button.danger {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Interview room */
+
+.room-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.room-header h1 {
+    margin: 0;
+}
+
+.timer {
+    font-variant-numeric: tabular-nums;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.timer.overtime {
+    color: var(--danger);
+}
+
+.voice-status {
+    margin: 1rem 0;
+    padding: 0.75rem 1rem;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.transcript {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.bubble {
+    max-width: 85%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+}
+
+.bubble.agent {
+    align-self: flex-start;
+    background: var(--agent-bubble);
+}
+
+.bubble.participant {
+    align-self: flex-end;
+    background: var(--participant-bubble);
+}
+
+.bubble .speaker {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+/* Result */
+
+.score {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.score-value {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.score-value small {
+    font-size: 1.25rem;
+    color: var(--muted);
+}
+
+.score-label {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+details {
+    margin-top: 1.5rem;
+}
+
+summary {
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.voice-status button {
+    margin-top: 0;
+}
+
+.voice-status .speaking {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.voice-status .listening {
+    color: var(--text);
+    font-weight: 500;
+}
+
+.caption {
+    margin: 0.5rem 0 0;
+    font-style: italic;
+    color: var(--text);
+}
+
+.voice-error {
+    margin: 0.5rem 0 0;
+    color: var(--danger);
+}
+
+/* <voice-panel> (wwwroot/js/voice-panel.js) */
+
+[hidden] {
+    display: none !important;
+}
+
+voice-panel p {
+    margin: 0.5rem 0 0;
+}
+
+voice-panel p:empty {
+    display: none;
+}

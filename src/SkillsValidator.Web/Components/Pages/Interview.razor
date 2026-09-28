@@ -1,0 +1,108 @@
+@page "/interview/{SessionId}"
+@implements IDisposable
+@inject ISessionInterviewService SessionService
+@inject ISkillConfigRepository ConfigRepository
+@inject NavigationManager Navigation
+
+<PageTitle>Interview</PageTitle>
+
+@if (loading)
+{
+    <p>Loading…</p>
+}
+else if (session is null || config is null)
+{
+    <SessionNotFound />
+}
+else
+{
+    <section class="card">
+        <div class="room-header">
+            <div>
+                <h1>@config.Title</h1>
+                <p class="hint">@config.AgentName is interviewing @session.ParticipantName</p>
+            </div>
+            <div class="timer @(IsOvertime ? "overtime" : "")">
+                @FormatTime(session.Duration) / @config.InterviewDurationInMinutes:00
+            </div>
+        </div>
+
+        @* The voice (mic, speaker, WebSocket) is handled by wwwroot/js/voice-panel.js.
+           When the agent says goodbye, it goes to the result page by itself. *@
+        <div class="voice-status">
+            <voice-panel session-id="@SessionId" agent-name="@config.AgentName"></voice-panel>
+        </div>
+
+        <TranscriptView Entries="session.Transcriptions" AgentName="@config.AgentName"
+                        ParticipantName="@session.ParticipantName" />
+
+        <button class="danger" disabled="@finishing" @onclick="FinishAsync">
+            @(finishing ? "Finishing…" : "End interview")
+        </button>
+    </section>
+}
+
+@code {
+    [Parameter] public string SessionId { get; set; } = "";
+
+    private InterviewSession? session;
+    private SkillConfig? config;
+    private bool loading = true;
+    private bool finishing;
+    private readonly CancellationTokenSource cts = new();
+
+    private bool IsOvertime =>
+        session is not null && config is not null &&
+        session.Duration > TimeSpan.FromMinutes(config.InterviewDurationInMinutes);
+
+    protected override async Task OnInitializedAsync()
+    {
+        session = await SessionService.GetSessionAsync(SessionId);
+        if (session is not null)
+            config = await ConfigRepository.GetAsync(session.ConfigId);
+
+        loading = false;
+
+        if (session is { State: not SessionState.Running })
+        {
+            Navigation.NavigateTo($"/result/{SessionId}");
+            return;
+        }
+
+        if (session is not null)
+            _ = RefreshLoopAsync(cts.Token);
+    }
+
+    // Refreshes the timer and the transcript once per second.
+    private async Task RefreshLoopAsync(CancellationToken ct)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(ct))
+            {
+                session = await SessionService.GetSessionAsync(SessionId);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    // Leaving the page removes <voice-panel>, which closes its WebSocket and stops the interview loop.
+    private async Task FinishAsync()
+    {
+        finishing = true;
+        await SessionService.FinishInterviewSessionAsync(SessionId);
+        Navigation.NavigateTo($"/result/{SessionId}");
+    }
+
+    private static string FormatTime(TimeSpan time) => $"{(int)time.TotalMinutes}:{time.Seconds:00}";
+
+    public void Dispose()
+    {
+        cts.Cancel();
+        cts.Dispose();
+    }
+}

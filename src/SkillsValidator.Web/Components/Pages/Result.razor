@@ -1,0 +1,114 @@
+@page "/result/{SessionId}"
+@implements IDisposable
+@inject ISessionInterviewService SessionService
+@inject ISkillConfigRepository ConfigRepository
+
+<PageTitle>Result</PageTitle>
+
+@if (loading)
+{
+    <p>Loading…</p>
+}
+else if (session is null)
+{
+    <SessionNotFound />
+}
+else if (session.Result is not { } result)
+{
+    <section class="card center">
+        <h1>Evaluating…</h1>
+        <p class="hint">
+            Thanks, @session.ParticipantName. Your interview is being evaluated; this page updates automatically.
+        </p>
+    </section>
+}
+else
+{
+    <section class="card">
+        <p class="hint">@config?.Title · @session.ParticipantName</p>
+
+        <div class="score">
+            <span class="score-value">@result.Score<small>/@result.MaxPoints</small></span>
+            <span class="score-label">@result.Label</span>
+        </div>
+
+        <h2>Summary</h2>
+        <p>@result.Summary</p>
+
+        <div class="columns">
+            <div>
+                <h2>Strong points</h2>
+                <ul>
+                    @foreach (var point in result.StrongPoints)
+                    {
+                        <li>@point</li>
+                    }
+                </ul>
+            </div>
+            <div>
+                <h2>Areas to improve</h2>
+                <ul>
+                    @foreach (var area in result.ImprovementAreas)
+                    {
+                        <li>@area</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <details>
+            <summary>Transcript</summary>
+            <TranscriptView Entries="session.Transcriptions" AgentName="@(config?.AgentName ?? "Agent")"
+                            ParticipantName="@session.ParticipantName" />
+        </details>
+
+        <a href="/" class="button">New interview</a>
+    </section>
+}
+
+@code {
+    [Parameter] public string SessionId { get; set; } = "";
+
+    private InterviewSession? session;
+    private SkillConfig? config;
+    private bool loading = true;
+    private readonly CancellationTokenSource cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        session = await SessionService.GetSessionAsync(SessionId);
+        if (session is not null)
+            config = await ConfigRepository.GetAsync(session.ConfigId);
+
+        loading = false;
+
+        if (session is { State: not SessionState.Reported })
+            _ = PollUntilReportedAsync(cts.Token);
+    }
+
+    // The evaluation runs in the background; poll until the result is ready.
+    private async Task PollUntilReportedAsync(CancellationToken ct)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(ct))
+            {
+                session = await SessionService.GetSessionAsync(SessionId);
+                await InvokeAsync(StateHasChanged);
+
+                if (session is null or { State: SessionState.Reported })
+                    return;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    public void Dispose()
+    {
+        cts.Cancel();
+        cts.Dispose();
+    }
+}

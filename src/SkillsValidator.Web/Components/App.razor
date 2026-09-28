@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["SkillsValidator.Web.styles.css"]" />
+    <ImportMap />
+    <HeadOutlet @rendermode="InteractiveServerNoPrerender" />
+</head>
+
+<body>
+    @* Every page runs interactively on the server over one SignalR connection (Blazor Server).
+       Prerendering is off, so each page initializes once. *@
+    <Routes @rendermode="InteractiveServerNoPrerender" />
+    <script src="_framework/blazor.web.js"></script>
+
+    @* The <voice-panel> tag used by the interview page: mic, speaker and its own WebSocket to the server. *@
+    <script src="js/voice-panel.js"></script>
+</body>
+
+</html>
+
+@code {
+    private static readonly IComponentRenderMode InteractiveServerNoPrerender =
+        new InteractiveServerRenderMode(prerender: false);
+}

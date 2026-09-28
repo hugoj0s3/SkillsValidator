@@ -1,0 +1,22 @@
+<div class="transcript">
+    @if (Entries.Count == 0)
+    {
+        <p class="hint">The conversation will appear here.</p>
+    }
+    else
+    {
+        @foreach (var entry in Entries)
+        {
+            <div class="bubble @(entry.Speaker == Speaker.Agent ? "agent" : "participant")">
+                <span class="speaker">@(entry.Speaker == Speaker.Agent ? AgentName : ParticipantName)</span>
+                <span>@entry.Text</span>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IList<TranscriptEntry> Entries { get; set; } = [];
+    [Parameter, EditorRequired] public string AgentName { get; set; } = "";
+    [Parameter, EditorRequired] public string ParticipantName { get; set; } = "";
+}

@@ -1,0 +1,21 @@
+{
+  "Id": "csharp",
+  "Title": "C# Programming",
+  "InterviewInstruction": "Assess practical C# and .NET knowledge. Start with the basics (types, classes, interfaces), then go deeper: async/await, LINQ, generics, memory and GC, dependency injection. Ask for concrete examples from real projects. Adapt the difficulty to the answers.",
+  "AgentTone": "Professional and encouraging, like a senior engineer in a friendly technical interview.",
+  "AgentName": "Alex",
+  "AgentVoiceGender": "Female",
+  "AgentVoiceType": "Neutral",
+  "Effort": "High",
+  "ReportInstruction": "Evaluate technical accuracy and depth. Do not penalize nervousness or small verbal mistakes. Mention concrete topics the participant should study.",
+  "MaxPoints": 5,
+  "InterviewDurationInMinutes": 15,
+  "ExtraInterviewDurationInMinutes": 3,
+  "PointInstructionMap": {
+    "1": { "Label": "Beginner", "Requirements": "Knows basic syntax only." },
+    "2": { "Label": "Junior", "Requirements": "Understands OOP, classes and interfaces." },
+    "3": { "Label": "Mid-level", "Requirements": "Uses async/await, LINQ and generics correctly." },
+    "4": { "Label": "Senior", "Requirements": "Explains trade-offs, performance and design decisions." },
+    "5": { "Label": "Expert", "Requirements": "Deep knowledge of the runtime, GC and advanced patterns." }
+  }
+}

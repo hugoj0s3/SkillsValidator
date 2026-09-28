@@ -1,0 +1,28 @@
+@page "/Error"
+@using System.Diagnostics
+
+@* Shown by app.UseExceptionHandler("/Error") outside Development. In Development you get the detailed error page instead. *@
+
+<PageTitle>Error</PageTitle>
+
+<section class="card error center">
+    <h1>Something went wrong</h1>
+    <p class="hint">An error occurred while processing your request.</p>
+
+    @if (RequestId is not null)
+    {
+        <p class="hint">Request ID: <code>@RequestId</code></p>
+    }
+
+    <a href="/" class="button">Back to start</a>
+</section>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId { get; set; }
+
+    protected override void OnInitialized() =>
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

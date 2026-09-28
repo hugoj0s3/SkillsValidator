@@ -1,0 +1,73 @@
+@page "/"
+@inject ISkillConfigRepository ConfigRepository
+@inject ISessionInterviewService SessionService
+@inject NavigationManager Navigation
+@inject StartupProblems StartupProblems
+
+<PageTitle>Skills Validator</PageTitle>
+
+@if (StartupProblems.Any)
+{
+    <section class="card error">
+        <h1>Setup problem</h1>
+        <pre>@string.Join(Environment.NewLine + Environment.NewLine, StartupProblems.Messages)</pre>
+        <p class="hint">Please fix the above and re-run the app.</p>
+    </section>
+}
+else
+{
+    <section class="card">
+        <h1>Start your interview</h1>
+
+        <label for="skill">Skill</label>
+        <select id="skill" @bind="selectedConfigId">
+            <option value="">Choose a skill…</option>
+            @foreach (var config in loadResult.Configs)
+            {
+                <option value="@config.Id">@config.Title</option>
+            }
+        </select>
+
+        @if (SelectedConfig is { } selected)
+        {
+            <p class="hint">
+                With @selected.AgentName · about @selected.InterviewDurationInMinutes minutes
+            </p>
+        }
+
+        <label for="name">Your name</label>
+        <input id="name" @bind="participantName" @bind:event="oninput" placeholder="e.g. Ana Silva" maxlength="80" />
+
+        <button class="primary" disabled="@(!CanStart)" @onclick="StartAsync">
+            @(starting ? "Starting…" : "Start interview")
+        </button>
+    </section>
+}
+
+@code {
+    private SkillConfigLoadResult loadResult = new();
+    private string selectedConfigId = "";
+    private string participantName = "";
+    private bool starting;
+
+    private SkillConfig? SelectedConfig =>
+        loadResult.Configs.FirstOrDefault(c => c.Id == selectedConfigId);
+
+    private bool CanStart =>
+        !starting && SelectedConfig is not null && !string.IsNullOrWhiteSpace(participantName);
+
+    protected override void OnInitialized()
+    {
+        loadResult = ConfigRepository.GetLoadResult();
+    }
+
+    private async Task StartAsync()
+    {
+        if (!CanStart)
+            return;
+
+        starting = true;
+        var sessionId = await SessionService.StartInterviewSessionAsync(participantName, SelectedConfig!);
+        Navigation.NavigateTo($"/interview/{sessionId}");
+    }
+}

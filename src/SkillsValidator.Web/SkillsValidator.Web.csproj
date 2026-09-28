@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\SkillsValidator.Engine\SkillsValidator.Engine.csproj" />
+    <ProjectReference Include="..\SkillsValidator.Engine.OpenAI\SkillsValidator.Engine.OpenAI.csproj" />
+    <ProjectReference Include="..\SkillsValidator.Engine.AzureSpeech\SkillsValidator.Engine.AzureSpeech.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>a1eafbd9-f731-49cd-9e55-89f5c66e4783</UserSecretsId>
+  </PropertyGroup>
+
+</Project>
